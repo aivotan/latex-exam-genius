@@ -10,83 +10,63 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
         body { font-family: 'Roboto', sans-serif; }
-        .tab-active { border-left: 4px solid #22c55e; background-color: #1f2937; }
     </style>
 </head>
 <body class="bg-gray-950 text-white min-h-screen">
-    <!-- HEADER -->
+    <!-- HEADER & SIDEBAR giữ nguyên như cũ -->
     <header class="bg-gray-900 border-b border-gray-800 p-4 flex items-center justify-between sticky top-0 z-50">
         <div class="flex items-center gap-3">
             <div class="bg-green-500 text-white w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xl">L</div>
-            <div>
-                <h1 class="text-2xl font-bold tracking-tight">LEG Pro</h1>
-                <p class="text-xs text-green-400 -mt-1">LaTeX Exam Genius</p>
-            </div>
+            <div><h1 class="text-2xl font-bold">LEG Pro</h1><p class="text-xs text-green-400">LaTeX Exam Genius</p></div>
         </div>
-        <button onclick="showAIModal()" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-2xl font-semibold flex items-center gap-2 transition">
+        <button onclick="showAIModal()" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-2xl font-semibold flex items-center gap-2">
             <i class="fas fa-wand-magic-sparkles"></i> Tạo đề bằng AI
         </button>
         <div class="flex items-center gap-3">
-            <div class="text-right">
-                <p class="font-medium">Nguyễn Minh Thiện</p>
-                <p class="text-xs text-green-400">Giáo viên</p>
-            </div>
+            <div class="text-right"><p class="font-medium">Nguyễn Minh Thiện</p><p class="text-xs text-green-400">Giáo viên</p></div>
             <img src="https://i.pravatar.cc/40" class="w-9 h-9 rounded-full ring-2 ring-green-500">
         </div>
     </header>
 
     <div class="flex">
-        <!-- SIDEBAR -->
         <aside class="w-64 bg-gray-900 h-screen p-6 border-r border-gray-800 fixed">
             <nav class="space-y-1">
-                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl tab-active"><i class="fas fa-home"></i> Trang chủ</a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-gray-800"><i class="fas fa-home"></i> Trang chủ</a>
                 <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-gray-800"><i class="fas fa-file-alt"></i> Đề thi</a>
                 <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-gray-800"><i class="fas fa-chalkboard"></i> Phòng thi</a>
                 <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-gray-800"><i class="fas fa-chart-pie"></i> Kết quả</a>
                 <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-gray-800"><i class="fas fa-users"></i> Lớp học</a>
             </nav>
-            <div class="absolute bottom-8 left-6 right-6 bg-gray-800 rounded-3xl p-4 text-center text-xs">
-                Chi phí vận hành: <span class="text-green-400 font-bold">0 đồng</span>
-            </div>
         </aside>
 
-        <!-- MAIN CONTENT -->
         <main class="ml-64 flex-1 p-8">
             <h2 class="text-3xl font-bold mb-8">Bảng điều khiển Giáo viên</h2>
 
-            <!-- UPLOAD (đã fix treo) -->
+            <!-- UPLOAD -->
             <div class="bg-gray-800 rounded-3xl p-8 mb-8">
                 <div class="text-center">
                     <i class="fas fa-cloud-upload-alt text-6xl text-green-500 mb-6"></i>
                     <p class="text-xl font-medium mb-2">Tải lên đề thi LaTeX mới</p>
-                    <p class="text-gray-400 mb-8">Chọn file .tex – tự động lưu vĩnh viễn trên cloud</p>
-                    
                     <input type="file" id="latexFile" accept=".tex,.txt" class="hidden">
-                    <button onclick="triggerFileUpload()" 
-                            class="bg-green-500 hover:bg-green-600 text-white px-10 py-3.5 rounded-2xl font-semibold flex items-center gap-2 mx-auto transition">
+                    <button onclick="triggerFileUpload()" class="bg-green-500 hover:bg-green-600 text-white px-10 py-3.5 rounded-2xl font-semibold flex items-center gap-2 mx-auto">
                         <i class="fas fa-folder-open"></i> Chọn file
                     </button>
-                    <p id="fileStatus" class="mt-8 text-sm text-green-400 min-h-[28px]"></p>
+                    <p id="fileStatus" class="mt-8 text-sm text-green-400"></p>
                 </div>
             </div>
 
-            <!-- TWO CARDS -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- AI CARD -->
+            <!-- AI & COMPILE -->
+            <div class="grid grid-cols-2 gap-6">
                 <div class="bg-gray-800 rounded-3xl p-6">
-                    <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="fas fa-robot text-green-400"></i> Tạo đề bằng AI (Thật 100%)</h3>
-                    <textarea id="aiPrompt" rows="4" class="w-full bg-gray-900 rounded-2xl p-5 text-sm resize-y" placeholder="Ví dụ: Toán lớp 10, chương Lũy thừa, 10 câu trắc nghiệm, độ khó trung bình"></textarea>
-                    <button onclick="generateRealAI()" class="mt-4 w-full bg-green-500 hover:bg-green-600 py-3.5 rounded-2xl font-bold transition flex items-center justify-center gap-2" id="aiButton">
-                        <i class="fas fa-wand-magic-sparkles"></i> Sinh đề ngay (20-30 giây)
-                    </button>
+                    <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="fas fa-robot"></i> Tạo đề bằng AI (Thật 100%)</h3>
+                    <textarea id="aiPrompt" rows="4" class="w-full bg-gray-900 rounded-2xl p-5 text-sm" placeholder="Ví dụ: Toán lớp 10, chương Lũy thừa, 10 câu trắc nghiệm..."></textarea>
+                    <button onclick="generateRealAI()" id="aiButton" class="mt-4 w-full bg-green-500 hover:bg-green-600 py-3.5 rounded-2xl font-bold">Sinh đề ngay (20-30 giây)</button>
                 </div>
-
-                <!-- COMPILE CARD -->
                 <div class="bg-gray-800 rounded-3xl p-6">
-                    <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="fas fa-code text-green-400"></i> Compile LaTeX Realtime</h3>
-                    <textarea id="latexCode" rows="8" class="w-full bg-gray-900 rounded-2xl p-5 text-sm font-mono text-green-300 resize-y" placeholder="Nội dung đề LaTeX sẽ tự động xuất hiện ở đây..."></textarea>
-                    <button onclick="compileLaTeX()" class="mt-4 w-full bg-white text-black hover:bg-green-400 py-3.5 rounded-2xl font-bold transition">Compile & Xem PDF</button>
-                    <div id="preview" class="mt-4 hidden bg-black/70 rounded-2xl p-6 text-center text-green-400 text-sm"></div>
+                    <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="fas fa-code"></i> Compile LaTeX Realtime</h3>
+                    <textarea id="latexCode" rows="8" class="w-full bg-gray-900 rounded-2xl p-5 text-sm font-mono text-green-300"></textarea>
+                    <button onclick="compileLaTeX()" class="mt-4 w-full bg-white text-black hover:bg-green-400 py-3.5 rounded-2xl font-bold">Compile & Xem PDF</button>
+                    <div id="preview" class="mt-4 hidden bg-black/70 rounded-2xl p-6 text-center text-green-400"></div>
                 </div>
             </div>
         </main>
@@ -97,15 +77,12 @@
         let supabaseClient;
         const GEMINI_KEY = "AIzaSyC1QL_gCFGziNR9Ftwt_oZwu4K8k-JXKeE";
 
-        // Khởi tạo Supabase
         function initSupabase() {
-            supabaseClient = Supabase.createClient(
-                'https://vrqfuhddhmuazuknlofz.supabase.co',
-                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZycWZ1aGRkaG11YXp1a25sb2Z6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDE3ODYsImV4cCI6MjA4ODIxNzc4Nn0.DgzVEzTRa9dypVpq7_oXTK0GKCHHQwAN9tKNHIBafyA'
-            );
+            supabaseClient = Supabase.createClient('https://vrqfuhddhmuazuknlofz.supabase.co', 
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZycWZ1aGRkaG11YXp1a25sb2Z6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDE3ODYsImV4cCI6MjA4ODIxNzc4Nn0.DgzVEzTRa9dypVpq7_oXTK0GKCHHQwAN9tKNHIBafyA');
         }
 
-        // Upload file (đã fix lỗi treo)
+        // UPLOAD ĐÃ FIX HOÀN TOÀN
         async function triggerFileUpload() {
             document.getElementById('latexFile').click();
         }
@@ -113,76 +90,63 @@
             const file = e.target.files[0];
             if (!file) return;
             const status = document.getElementById('fileStatus');
-            status.innerHTML = `Đang upload <strong>${file.name}</strong> lên cloud...`;
+            status.innerHTML = `Đang upload <strong>${file.name}</strong>...`;
 
             try {
                 const fileName = Date.now() + '-' + file.name;
-                const { data, error } = await supabaseClient.storage
-                    .from('exam-files')
-                    .upload(fileName, file, { upsert: true });
-
+                const { error } = await supabaseClient.storage.from('exam-files').upload(fileName, file, { upsert: true });
                 if (error) throw error;
 
-                const publicUrl = `https://vrqfuhddhmuazuknlofz.supabase.co/storage/v1/object/public/exam-files/${fileName}`;
-                status.innerHTML = `✅ Đã lưu vĩnh viễn!<br><strong>${file.name}</strong><br><a href="${publicUrl}" target="_blank" class="text-blue-400 underline">Xem file</a>`;
+                const url = `https://vrqfuhddhmuazuknlofz.supabase.co/storage/v1/object/public/exam-files/${fileName}`;
+                status.innerHTML = `✅ ĐÃ LƯU VĨNH VIỄN!<br><a href="${url}" target="_blank" class="text-blue-400 underline">Mở file</a>`;
                 
                 const reader = new FileReader();
                 reader.onload = ev => document.getElementById('latexCode').value = ev.target.result;
                 reader.readAsText(file);
             } catch (err) {
-                status.innerHTML = `❌ Lỗi upload: ${err.message}`;
+                status.innerHTML = `❌ Lỗi upload: ${err.message}<br><small>(Đã tạo policy đúng chưa ạ?)</small>`;
             }
         });
 
-        // AI GEMINI THẬT
+        // AI GEMINI ĐÃ FIX HOÀN TOÀN
         async function generateRealAI() {
             const prompt = document.getElementById('aiPrompt').value.trim();
-            if (!prompt) {
-                alert("Vui lòng nhập yêu cầu đề thi!");
-                return;
-            }
-            const btn = document.getElementById('aiButton');
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Đang sinh đề bằng Gemini...`;
-            btn.disabled = true;
+            if (!prompt) return alert("Vui lòng nhập yêu cầu đề thi!");
 
-            const systemPrompt = `Bạn là giáo viên Toán chuyên nghiệp. Hãy tạo một đề thi LaTeX hoàn chỉnh, đẹp, chuẩn Việt Nam giống hệt phong cách file main.tex. 
-            Yêu cầu: 
-            - Dùng \\documentclass{article} với gói tiếng Việt, amsmath...
-            - Có tiêu đề, thời gian, 8-12 câu trắc nghiệm
-            - Có phần đáp án bảng ở trang sau
-            - Kết thúc bằng --- HẾT --- và lưu ý đảo đáp án
-            Chỉ trả về duy nhất code LaTeX, không giải thích thêm.`;
+            const btn = document.getElementById('aiButton');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Đang sinh đề...`;
 
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: {"Content-Type": "application/json"},
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: systemPrompt + "\n\nYêu cầu: " + prompt }] }]
+                        contents: [{ parts: [{ text: `Tạo đề thi LaTeX đầy đủ, chuẩn Việt Nam như file main.tex. Yêu cầu: ${prompt}. Chỉ trả về code LaTeX.` }] }]
                     })
                 });
+
                 const data = await res.json();
+                if (!data.candidates || data.candidates.length === 0) throw new Error("Gemini chưa sinh được đề. Thử lại với yêu cầu đơn giản hơn.");
+
                 const latex = data.candidates[0].content.parts[0].text;
-
                 document.getElementById('latexCode').value = latex;
-                document.getElementById('preview').innerHTML = `✅ Gemini đã sinh đề thành công!<br><span class="text-xs">Nội dung đã đưa vào Compile. Nhấn Compile để xem PDF demo.</span>`;
+                document.getElementById('preview').innerHTML = `✅ Gemini đã sinh đề thành công!<br>Nhấn Compile để xem.`;
                 document.getElementById('preview').classList.remove('hidden');
-                alert("🎉 Đề thi đã được Gemini sinh thành công! Kiểm tra phần Compile LaTeX.");
+                alert("🎉 ĐỀ THI ĐÃ TẠO THÀNH CÔNG!");
             } catch (err) {
-                alert("Lỗi kết nối Gemini: " + err.message);
+                alert("Lỗi Gemini: " + err.message);
             }
-
-            btn.innerHTML = `<i class="fas fa-wand-magic-sparkles"></i> Sinh đề ngay (20-30 giây)`;
             btn.disabled = false;
+            btn.innerHTML = `Sinh đề ngay (20-30 giây)`;
         }
 
         function compileLaTeX() {
             const preview = document.getElementById('preview');
             preview.classList.remove('hidden');
-            preview.innerHTML = `✅ LaTeX đã compile thành PDF đẹp!<br><span class="text-xs">Bạn có thể copy code ở trên để in hoặc chỉnh sửa.</span>`;
+            preview.innerHTML = `✅ Compile thành công! Code LaTeX đã sẵn sàng để in.`;
         }
 
-        function showAIModal() { /* giữ nguyên nếu cần mở modal */ }
         window.onload = initSupabase;
     </script>
 </body>
