@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LEG Pro - LaTeX Exam Genius</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
@@ -125,16 +125,16 @@ const SUPABASE_URL = 'https://vrqfuhddhmuazuknlofz.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZycWZ1aGRkaG11YXp1a25sb2Z6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDE3ODYsImV4cCI6MjA4ODIxNzc4Nn0.DgzVEzTRa9dypVpq7_oXTK0GKCHHQwAN9tKNHIBafyA';
 const GEMINI_KEY = 'AIzaSyC1QL_gCFGziNR9Ftwt_oZwu4K8k-JXKeE';
 
-// ==================== KHỞI TẠO SUPABASE ====================
+// ==================== KHỞI TẠO SUPABASE NGAY LẬP TỨC ====================
 let supabaseClient = null;
 
 function initSupabase() {
     try {
         if (typeof Supabase !== 'undefined') {
             supabaseClient = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            console.log('✅ Supabase initialized');
+            console.log('✅ Supabase initialized successfully');
         } else {
-            console.warn('⚠️ Supabase library not loaded yet, will retry...');
+            console.warn('⚠️ Supabase library not loaded yet, retrying in 500ms...');
             setTimeout(initSupabase, 500);
         }
     } catch(e) {
@@ -142,17 +142,11 @@ function initSupabase() {
     }
 }
 
-// ==================== UPLOAD FILE ====================
-function triggerFileUpload() {
-    const fileInput = document.getElementById('latexFile');
-    if (fileInput) {
-        fileInput.click();
-    }
-}
+// Khởi tạo ngay khi script load
+initSupabase();
 
+// ==================== UPLOAD FILE ====================
 document.addEventListener('DOMContentLoaded', function() {
-    initSupabase();
-    
     const fileInput = document.getElementById('latexFile');
     const statusEl = document.getElementById('fileStatus');
     
@@ -165,7 +159,8 @@ document.addEventListener('DOMContentLoaded', function() {
             statusEl.innerHTML = '<span class="text-green-400">⏳ Đang upload <strong>' + file.name + '</strong>...</span>';
             
             try {
-                if (!supabaseClient) {
+                // Kiểm tra supabaseClient đã sẵn sàng chưa
+                if (!supabaseClient || !supabaseClient.storage) {
                     throw new Error('Supabase chưa sẵn sàng. Vui lòng refresh trang.');
                 }
                 
@@ -181,6 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     '<span class="text-green-400">File: ' + file.name + '</span><br>' +
                     '<a href="' + publicUrl + '" target="_blank" class="text-blue-400 underline">📎 Mở file</a>';
                 
+                // Đọc nội dung file vào textarea
                 const reader = new FileReader();
                 reader.onload = function(ev) {
                     document.getElementById('latexCode').value = ev.target.result;
@@ -191,7 +187,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 
             } catch(err) {
                 console.error('Upload error:', err);
-                statusEl.innerHTML = '❌ <strong>Lỗi upload:</strong> ' + err.message;
+                statusEl.innerHTML = '❌ <strong>Lỗi upload:</strong> ' + err.message + 
+                    '<br><small class="text-gray-500">(Kiểm tra: 1. Policy bucket đã tạo chưa? 2. Refresh trang và thử lại)</small>';
                 alert('❌ Lỗi upload: ' + err.message);
             }
         });
@@ -282,47 +279,47 @@ async function generateRealAI() {
 \\textbf{PHẦN I: TRẮC NGHIỆM (5 điểm)}
 
 \\begin{enumerate}
-\\item[\\textbf{Câu 1:}] Rút gọn biểu thức $\\\\frac{a^{\\\\frac{2}{3}} \\\\cdot a^{\\\\frac{1}{3}}}{a^{\\\\frac{1}{2}}}$ với $a > 0$.
-\\\\begin{enumerate}
-\\\\item[A.] $a^{\\\\frac{1}{2}}$ \\\\item[B.] $a^{\\\\frac{1}{3}}$
-\\\\item[C.] $a^{\\\\frac{5}{6}}$ \\\\item[D.] $a$
+\\item[\\textbf{Câu 1:}] Rút gọn biểu thức $\\frac{a^{\\frac{2}{3}} \\cdot a^{\\frac{1}{3}}}{a^{\\frac{1}{2}}}$ với $a > 0$.
+\\begin{enumerate}
+\\item[A.] $a^{\\frac{1}{2}}$ \\item[B.] $a^{\\frac{1}{3}}$
+\\item[C.] $a^{\\frac{5}{6}}$ \\item[D.] $a$
 \\end{enumerate}
 
-\\item[\\textbf{Câu 2:}] Tìm tập xác định của hàm số $y = (x-2)^{\\\\frac{1}{3}}$.
-\\\\begin{enumerate}
-\\\\item[A.] $\\\\mathbb{R}$ \\\\item[B.] $[2; +\\\\infty)$
-\\\\item[C.] $(2; +\\\\infty)$ \\\\item[D.] $\\\\mathbb{R} \\\\setminus \\\\{2\\\\}$
+\\item[\\textbf{Câu 2:}] Tìm tập xác định của hàm số $y = (x-2)^{\\frac{1}{3}}$.
+\\begin{enumerate}
+\\item[A.] $\\mathbb{R}$ \\item[B.] $[2; +\\infty)$
+\\item[C.] $(2; +\\infty)$ \\item[D.] $\\mathbb{R} \\setminus \\{2\\}$
 \\end{enumerate}
 
-\\item[\\textbf{Câu 3:}] Đạo hàm của hàm số $y = x^{\\\\sqrt{2}}$ là:
-\\\\begin{enumerate}
-\\\\item[A.] $\\\\sqrt{2}x^{\\\\sqrt{2}-1}$ \\\\item[B.] $x^{\\\\sqrt{2}-1}$
-\\\\item[C.] $\\\\frac{x^{\\\\sqrt{2}}}{\\\\sqrt{2}}$ \\\\item[D.] $\\\\sqrt{2}x^{\\\\sqrt{2}}$
+\\item[\\textbf{Câu 3:}] Đạo hàm của hàm số $y = x^{\\sqrt{2}}$ là:
+\\begin{enumerate}
+\\item[A.] $\\sqrt{2}x^{\\sqrt{2}-1}$ \\item[B.] $x^{\\sqrt{2}-1}$
+\\item[C.] $\\frac{x^{\\sqrt{2}}}{\\sqrt{2}}$ \\item[D.] $\\sqrt{2}x^{\\sqrt{2}}$
 \\end{enumerate}
 
-\\item[\\textbf{Câu 4:}] Giá trị của $8^{\\\\frac{2}{3}}$ bằng:
-\\\\begin{enumerate}
-\\\\item[A.] 2 \\\\item[B.] 4 \\\\item[C.] 6 \\\\item[D.] 8
+\\item[\\textbf{Câu 4:}] Giá trị của $8^{\\frac{2}{3}}$ bằng:
+\\begin{enumerate}
+\\item[A.] 2 \\item[B.] 4 \\item[C.] 6 \\item[D.] 8
 \\end{enumerate}
 
 \\item[\\textbf{Câu 5:}] Hàm số $y = x^{-2}$ đồng biến trên khoảng nào?
-\\\\begin{enumerate}
-\\\\item[A.] $(0; +\\\\infty)$ \\\\item[B.] $(-\\\\infty; 0)$
-\\\\item[C.] $\\\\mathbb{R}$ \\\\item[D.] $[0; +\\\\infty)$
+\\begin{enumerate}
+\\item[A.] $(0; +\\infty)$ \\item[B.] $(-\\infty; 0)$
+\\item[C.] $\\mathbb{R}$ \\item[D.] $[0; +\\infty)$
 \\end{enumerate}
 \\end{enumerate}
 
 \\vspace{0.5cm}
 \\textbf{PHẦN II: TỰ LUẬN (5 điểm)}
 
-\\textbf{Câu 6 (3 điểm):} Cho hàm số $y = x^{\\\\frac{3}{2}}$.
-\\\\begin{enumerate}
-\\\\item[a)] Tìm tập xác định.
-\\\\item[b)] Tính đạo hàm.
-\\\\item[c)] Tính giá trị của hàm số tại $x = 4$.
+\\textbf{Câu 6 (3 điểm):} Cho hàm số $y = x^{\\frac{3}{2}}$.
+\\begin{enumerate}
+\\item[a)] Tìm tập xác định.
+\\item[b)] Tính đạo hàm.
+\\item[c)] Tính giá trị của hàm số tại $x = 4$.
 \\end{enumerate}
 
-\\textbf{Câu 7 (2 điểm):} Giải phương trình: $x^{\\\\frac{2}{3}} - 4x^{\\\\frac{1}{3}} + 3 = 0$
+\\textbf{Câu 7 (2 điểm):} Giải phương trình: $x^{\\frac{2}{3}} - 4x^{\\frac{1}{3}} + 3 = 0$
 
 \\vspace{1cm}
 \\begin{center}
