@@ -42,14 +42,15 @@
         <main class="ml-64 flex-1 p-8">
             <h2 class="text-3xl font-bold mb-8">Bảng điều khiển Giáo viên</h2>
 
-            <!-- UPLOAD -->
+            <!-- UPLOAD – đã fix trigger chọn file -->
             <div class="bg-gray-800 rounded-3xl p-8 mb-8">
                 <div class="text-center">
                     <i class="fas fa-cloud-upload-alt text-6xl text-green-500 mb-6"></i>
                     <p class="text-xl font-medium mb-2">Tải lên đề thi LaTeX mới</p>
                     <input type="file" id="latexFile" accept=".tex,.txt" class="hidden">
-                    <button onclick="triggerFileUpload()" class="bg-green-500 hover:bg-green-600 text-white px-10 py-3.5 rounded-2xl font-semibold flex items-center gap-2 mx-auto">
-                        <i class="fas fa-folder-open"></i> Chọn file
+                    <button onclick="document.getElementById('latexFile').click()" 
+                            class="bg-green-500 hover:bg-green-600 text-white px-10 py-3.5 rounded-2xl font-semibold flex items-center gap-2 mx-auto transition">
+                        <i class="fas fa-folder-open"></i> Chọn file từ laptop
                     </button>
                     <p id="fileStatus" class="mt-8 text-sm text-green-400"></p>
                 </div>
@@ -59,7 +60,7 @@
             <div class="grid grid-cols-2 gap-6">
                 <div class="bg-gray-800 rounded-3xl p-6">
                     <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="fas fa-robot"></i> Tạo đề bằng AI (Thật 100%)</h3>
-                    <textarea id="aiPrompt" rows="4" class="w-full bg-gray-900 rounded-2xl p-5 text-sm" placeholder="Ví dụ: Toán lớp 10, chương Lũy thừa, 5 câu trắc nghiệm đơn giản"></textarea>
+                    <textarea id="aiPrompt" rows="4" class="w-full bg-gray-900 rounded-2xl p-5 text-sm" placeholder="Ví dụ: Toán lớp 10, 5 câu trắc nghiệm đơn giản"></textarea>
                     <button onclick="generateRealAI()" id="aiButton" class="mt-4 w-full bg-green-500 hover:bg-green-600 py-3.5 rounded-2xl font-bold">Sinh đề ngay (20-30 giây)</button>
                 </div>
                 <div class="bg-gray-800 rounded-3xl p-6">
@@ -81,7 +82,7 @@
             supabaseClient = Supabase.createClient('https://vrqfuhddhmuazuknlofz.supabase.co', 
                 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZycWZ1aGRkaG11YXp1a25sb2Z6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDE3ODYsImV4cCI6MjA4ODIxNzc4Nn0.DgzVEzTRa9dypVpq7_oXTK0GKCHHQwAN9tKNHIBafyA');
 
-            // UPLOAD – luôn có thông báo
+            // UPLOAD – trigger rõ ràng
             document.getElementById('latexFile').addEventListener('change', async function(e) {
                 const file = e.target.files[0];
                 if (!file) return;
@@ -95,7 +96,7 @@
 
                     const url = `https://vrqfuhddhmuazuknlofz.supabase.co/storage/v1/object/public/exam-files/${fileName}`;
                     status.innerHTML = `✅ ĐÃ LƯU VĨNH VIỄN!<br><a href="${url}" target="_blank" class="text-blue-400 underline">Mở file</a>`;
-                    alert("🎉 Upload thành công! File đã lưu trên cloud Supabase.");
+                    alert("🎉 Upload thành công! File đã lưu trên cloud.");
                     
                     const reader = new FileReader();
                     reader.onload = ev => document.getElementById('latexCode').value = ev.target.result;
@@ -107,7 +108,7 @@
             });
         };
 
-        // AI GEMINI – nếu lỗi thì đưa mẫu đề đẹp ngay
+        // AI – fallback mẫu đề ngay lập tức
         async function generateRealAI() {
             const prompt = document.getElementById('aiPrompt').value.trim() || "Toán lớp 10, 5 câu trắc nghiệm đơn giản";
             const btn = document.getElementById('aiButton');
@@ -119,31 +120,33 @@
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: `Tạo đề thi LaTeX chuẩn Việt Nam. Yêu cầu: ${prompt}. Chỉ trả về code LaTeX.` }] }],
+                        contents: [{ parts: [{ text: `Tạo đề thi LaTeX chuẩn Việt Nam. Yêu cầu ngắn: ${prompt}. Chỉ trả về code LaTeX.` }] }],
                         safetySettings: [{ category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }]
                     })
                 });
                 const data = await res.json();
-                if (!data.candidates || data.candidates.length === 0) throw new Error("Gemini chưa sinh được");
-                document.getElementById('latexCode').value = data.candidates[0].content.parts[0].text;
-                alert("🎉 Gemini đã sinh đề thành công!");
-            } catch (err) {
-                // Fallback: đưa mẫu đề đẹp luôn
-                document.getElementById('latexCode').value = `\\documentclass[12pt,a4paper]{article}
+                if (data.candidates && data.candidates.length > 0) {
+                    document.getElementById('latexCode').value = data.candidates[0].content.parts[0].text;
+                    alert("🎉 Gemini đã sinh đề thành công!");
+                    return;
+                }
+            } catch (e) {}
+
+            // FALLBACK: đưa mẫu đề đẹp ngay
+            document.getElementById('latexCode').value = `\\documentclass[12pt,a4paper]{article}
 \\usepackage[utf8]{inputenc}
 \\usepackage[T5]{fontenc}
 \\usepackage[vietnamese]{babel}
 \\usepackage{amsmath, amssymb}
 \\begin{document}
 \\begin{center}
-    \\textbf{\\Large ĐỀ THI THỬ MẪU}\\
-    \\textbf{Môn: Toán - Lớp 10}
+    \\textbf{\\Large ĐỀ KIỂM TRA 15 PHÚT}\\\\
+    \\textbf{Môn: Toán - Chương: Lũy thừa}
 \\end{center}
 \\vspace{1cm}
 Câu 1: ... (mẫu đề đẹp giống file main.tex của thầy)
 \\end{document}`;
-                alert("⚠️ Gemini tạm thời chưa sinh được. Đã đưa mẫu đề LaTeX đẹp để thầy/cô dùng ngay!");
-            }
+            alert("⚠️ Gemini tạm thời chưa sinh được. Đã đưa mẫu đề LaTeX đẹp để thầy/cô dùng ngay!");
             btn.disabled = false;
             btn.innerHTML = `Sinh đề ngay (20-30 giây)`;
         }
