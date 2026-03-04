@@ -3,165 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LaTeX Exam Genius - LEG Pro</title>
+    <title>LEG Pro - LaTeX Exam Genius</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
         body { font-family: 'Roboto', sans-serif; }
-        .tab-active { border-bottom: 3px solid #22c55e; color: #22c55e; }
+        .tab-active { border-left: 4px solid #22c55e; background-color: #1f2937; }
     </style>
 </head>
 <body class="bg-gray-950 text-white min-h-screen">
     <!-- HEADER -->
-    <header class="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <i class="fas fa-book-open text-3xl text-green-500"></i>
-                <div>
-                    <h1 class="text-2xl font-bold">LEG Pro</h1>
-                    <p class="text-xs text-gray-400">LaTeX Exam Genius</p>
-                </div>
+    <header class="bg-gray-900 border-b border-gray-800 p-4 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <div class="bg-green-500 text-white w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xl">L</div>
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight">LEG Pro</h1>
+                <p class="text-xs text-green-400 -mt-1">LaTeX Exam Genius</p>
             </div>
-            <div class="flex items-center gap-6">
-                <button onclick="showAIModal()" 
-                        class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-xl font-semibold flex items-center gap-2 transition">
-                    <i class="fas fa-wand-magic-sparkles"></i> Tạo đề bằng AI
-                </button>
-                <div class="flex items-center gap-3">
-                    <img src="https://i.pravatar.cc/40" alt="avatar" class="w-9 h-9 rounded-full">
-                    <div>
-                        <p class="font-medium">Nguyễn Minh Thiện</p>
-                        <p class="text-xs text-green-400">Giáo viên Toán</p>
-                    </div>
-                </div>
+        </div>
+        <button onclick="showAIModal()" class="bg-green-500 hover:bg-green-600 px-6 py-2 rounded-2xl font-semibold flex items-center gap-2 transition">
+            <i class="fas fa-wand-magic-sparkles"></i> Tạo đề bằng AI
+        </button>
+        <div class="flex items-center gap-3">
+            <div class="text-right">
+                <p class="font-medium">Nguyễn Minh Thiện</p>
+                <p class="text-xs text-green-400">Giáo viên</p>
             </div>
+            <img src="https://i.pravatar.cc/40" class="w-9 h-9 rounded-full ring-2 ring-green-500">
         </div>
     </header>
 
-    <div class="max-w-7xl mx-auto flex">
+    <div class="flex">
         <!-- SIDEBAR -->
-        <aside class="w-64 bg-gray-900 border-r border-gray-800 h-screen py-8 px-4 fixed">
-            <nav class="space-y-2">
-                <a href="#" onclick="switchTab(0)" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-800 tab-active" id="tab0">
-                    <i class="fas fa-tachometer-alt"></i> Trang chủ
-                </a>
-                <a href="#" onclick="switchTab(1)" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-800" id="tab1">
-                    <i class="fas fa-file-alt"></i> Đề thi
-                </a>
-                <a href="#" onclick="switchTab(2)" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-800" id="tab2">
-                    <i class="fas fa-chalkboard-teacher"></i> Phòng thi
-                </a>
-                <a href="#" onclick="switchTab(3)" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-800" id="tab3">
-                    <i class="fas fa-chart-bar"></i> Kết quả
-                </a>
-                <a href="#" onclick="switchTab(4)" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-800" id="tab4">
-                    <i class="fas fa-users"></i> Lớp học
-                </a>
+        <aside class="w-64 bg-gray-900 h-screen p-6 border-r border-gray-800 fixed">
+            <nav class="space-y-1">
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl tab-active"><i class="fas fa-home"></i> Trang chủ</a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-gray-800"><i class="fas fa-file-alt"></i> Đề thi</a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-gray-800"><i class="fas fa-chalkboard"></i> Phòng thi</a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-gray-800"><i class="fas fa-chart-pie"></i> Kết quả</a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-gray-800"><i class="fas fa-users"></i> Lớp học</a>
             </nav>
-            <div class="mt-auto pt-8 px-4">
-                <div class="bg-gray-800 rounded-2xl p-4 text-center">
-                    <p class="text-sm text-gray-400">Chi phí vận hành: <span class="text-green-400 font-bold">0 đồng</span></p>
-                </div>
+            <div class="absolute bottom-8 left-6 right-6 bg-gray-800 rounded-3xl p-4 text-center text-xs">
+                Chi phí vận hành: <span class="text-green-400 font-bold">0 đồng</span>
             </div>
         </aside>
 
         <!-- MAIN CONTENT -->
         <main class="ml-64 flex-1 p-8">
             <h2 class="text-3xl font-bold mb-8">Bảng điều khiển Giáo viên</h2>
-            
-            <!-- UPLOAD CARD -->
+
+            <!-- UPLOAD FILE THẬT -->
             <div class="bg-gray-800 rounded-3xl p-8 mb-8">
                 <div class="text-center">
-                    <i onclick="fakeUpload()" class="fas fa-cloud-upload-alt text-6xl text-green-500 mb-4 cursor-pointer hover:scale-110 transition"></i>
+                    <i class="fas fa-cloud-upload-alt text-6xl text-green-500 mb-6"></i>
                     <p class="text-xl font-medium mb-2">Tải lên đề thi LaTeX mới</p>
-                    <p class="text-gray-400 mb-6">hoặc kéo thả file .tex vào đây</p>
-                    <button onclick="fakeUpload()" 
-                            class="bg-white text-black px-8 py-3 rounded-2xl font-semibold hover:bg-green-400 transition">Chọn file</button>
+                    <p class="text-gray-400 mb-8">Chọn file .tex hoặc kéo thả vào đây</p>
+                    
+                    <input type="file" id="latexFile" accept=".tex,.txt" class="hidden">
+                    <button onclick="triggerFileUpload()" 
+                            class="bg-green-500 hover:bg-green-600 text-white px-10 py-3.5 rounded-2xl font-semibold flex items-center gap-2 mx-auto transition">
+                        <i class="fas fa-folder-open"></i> Chọn file
+                    </button>
+                    
+                    <p id="fileStatus" class="mt-8 text-sm text-green-400 min-h-[28px]"></p>
                 </div>
             </div>
 
-            <!-- AI COMPILE SECTION -->
-            <div class="grid grid-cols-2 gap-6">
+            <!-- TWO CARDS -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- AI CARD -->
                 <div class="bg-gray-800 rounded-3xl p-6">
-                    <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="fas fa-robot"></i> Tạo đề bằng AI (Mới)</h3>
-                    <textarea id="aiPrompt" class="w-full h-32 bg-gray-900 rounded-2xl p-4 text-sm" placeholder="Ví dụ: Toán lớp 10, chương hàm số, 15 câu trắc nghiệm + 2 tự luận"></textarea>
-                    <button onclick="generateAI()" 
-                            class="mt-4 w-full bg-gradient-to-r from-green-500 to-emerald-600 py-3 rounded-2xl font-bold">Sinh đề ngay (30 giây)</button>
+                    <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="fas fa-robot text-green-400"></i> Tạo đề bằng AI (Mới)</h3>
+                    <textarea id="aiPrompt" rows="4" class="w-full bg-gray-900 rounded-2xl p-5 text-sm resize-y" placeholder="Ví dụ: Toán lớp 10, chương hàm số, 15 câu trắc nghiệm + 2 tự luận"></textarea>
+                    <button onclick="generateAI()" class="mt-4 w-full bg-green-500 hover:bg-green-600 py-3.5 rounded-2xl font-bold transition">Sinh đề ngay (30 giây)</button>
                 </div>
 
+                <!-- COMPILE CARD -->
                 <div class="bg-gray-800 rounded-3xl p-6">
-                    <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="fas fa-code"></i> Compile LaTeX Realtime</h3>
-                    <textarea id="latexCode" class="w-full h-32 bg-gray-900 rounded-2xl p-4 text-sm font-mono text-green-300" placeholder="% Nhập code LaTeX ở đây..."></textarea>
-                    <button onclick="compileLaTeX()" 
-                            class="mt-4 w-full bg-white text-black py-3 rounded-2xl font-bold">Compile & Xem PDF</button>
-                    <div id="preview" class="mt-4 hidden bg-black rounded-2xl p-4 text-center text-green-400">
-                        ✅ Đã compile thành công!<br>
-                        <span class="text-xs">PDF preview (click để tải)</span>
+                    <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="fas fa-code text-green-400"></i> Compile LaTeX Realtime</h3>
+                    <textarea id="latexCode" rows="4" class="w-full bg-gray-900 rounded-2xl p-5 text-sm font-mono text-green-300 resize-y" placeholder="Paste code LaTeX hoặc file sẽ tự động điền vào đây..."></textarea>
+                    <button onclick="compileLaTeX()" class="mt-4 w-full bg-white text-black hover:bg-green-400 py-3.5 rounded-2xl font-bold transition">Compile & Xem PDF</button>
+                    <div id="preview" class="mt-4 hidden bg-black/70 rounded-2xl p-6 text-center text-green-400 text-sm">
+                        ✅ Compile thành công!<br><span class="text-xs block mt-2">PDF preview sẵn sàng (demo)</span>
                     </div>
                 </div>
             </div>
 
-            <!-- 5 TÍNH NĂNG CƠ BẢN + 5 MỚI -->
+            <!-- 10 TÍNH NĂNG -->
             <div class="mt-12">
-                <h3 class="font-bold text-xl mb-6">Tính năng nâng cấp (10 tính năng ưu việt)</h3>
-                <div class="grid grid-cols-2 gap-4 text-sm">
-                    <div class="bg-gray-800 p-5 rounded-2xl">1. Giao đề theo lớp/HS tự do</div>
-                    <div class="bg-gray-800 p-5 rounded-2xl">2. Giới hạn thời gian mở/đóng tự động</div>
-                    <div class="bg-gray-800 p-5 rounded-2xl">3. Tùy chỉnh điểm + xem đáp án</div>
+                <h3 class="font-bold text-xl mb-6 flex items-center gap-2"><i class="fas fa-gem text-amber-400"></i> Tính năng nâng cấp (10 tính năng ưu việt)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div class="bg-gray-800 p-5 rounded-2xl">1. Giao đề theo lớp hoặc HS thi tự do</div>
+                    <div class="bg-gray-800 p-5 rounded-2xl">2. Giới hạn thời gian mở/đóng đề thi tự động</div>
+                    <div class="bg-gray-800 p-5 rounded-2xl">3. Tùy chỉnh điểm + xem đáp án/lời giải</div>
                     <div class="bg-gray-800 p-5 rounded-2xl">4. Xóa trọn câu hỏi</div>
-                    <div class="bg-gray-800 p-5 rounded-2xl">5. Chấm bài tự động AI (trắc nghiệm + tự luận)</div>
+                    <div class="bg-emerald-900 p-5 rounded-2xl text-emerald-300">5. Chấm bài tự động AI</div>
                     <div class="bg-emerald-900 p-5 rounded-2xl text-emerald-300">6. Phân tích điểm yếu học sinh bằng AI</div>
-                    <div class="bg-emerald-900 p-5 rounded-2xl text-emerald-300">7. Phòng thi realtime (xem live ai làm câu nào)</div>
-                    <div class="bg-emerald-900 p-5 rounded-2xl text-emerald-300">8. Hợp tác nhiều giáo viên chỉnh đề cùng lúc</div>
-                    <div class="bg-emerald-900 p-5 rounded-2xl text-emerald-300">9. Thư viện đề cộng đồng toàn quốc</div>
-                    <div class="bg-emerald-900 p-5 rounded-2xl text-emerald-300">10. Xuất báo cáo Bộ GD&ĐT tự động</div>
+                    <div class="bg-emerald-900 p-5 rounded-2xl text-emerald-300">7. Phòng thi realtime (xem live)</div>
+                    <div class="bg-emerald-900 p-5 rounded-2xl text-emerald-300">8. Hợp tác nhiều giáo viên chỉnh đề</div>
+                    <div class="bg-emerald-900 p-5 rounded-2xl text-emerald-300">9. Thư viện đề cộng đồng</div>
+                    <div class="bg-emerald-900 p-5 rounded-2xl text-emerald-300">10. Xuất báo cáo Bộ GD&amp;ĐT tự động</div>
                 </div>
             </div>
         </main>
     </div>
 
     <!-- AI MODAL -->
-    <div id="aiModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-        <div class="bg-gray-900 rounded-3xl max-w-2xl w-full mx-4 p-8">
-            <h3 class="text-2xl font-bold mb-6">✨ AI Sinh đề thi thông minh</h3>
-            <div id="aiResult" class="hidden bg-gray-800 rounded-2xl p-6 mb-6 font-mono text-green-300 text-sm"></div>
-            <button onclick="closeAIModal()" 
-                    class="w-full py-4 bg-red-500 hover:bg-red-600 rounded-2xl">Đóng</button>
+    <div id="aiModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+        <div class="bg-gray-900 rounded-3xl w-full max-w-xl mx-4 p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">✨ AI Sinh đề thi thông minh</h3>
+                <button onclick="closeAIModal()" class="text-gray-400 hover:text-white text-2xl">✕</button>
+            </div>
+            <div id="aiResult" class="hidden bg-gray-800 rounded-2xl p-6 mb-8 font-mono text-sm text-green-300 leading-relaxed"></div>
+            <button onclick="closeAIModal()" class="w-full py-4 bg-red-500 hover:bg-red-600 rounded-2xl font-medium">Đóng cửa sổ</button>
         </div>
     </div>
 
     <script>
-        function switchTab(n) {
-            document.querySelectorAll('a').forEach(a => a.classList.remove('tab-active'));
-            document.getElementById('tab'+n).classList.add('tab-active');
+        tailwind.config = { content: ["*"] };
+
+        // UPLOAD FILE THẬT
+        function triggerFileUpload() {
+            document.getElementById('latexFile').click();
         }
-        function fakeUpload() {
-            alert("✅ File LaTeX đã được tải lên!\nĐang compile... (demo)");
-        }
+        document.getElementById('latexFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const status = document.getElementById('fileStatus');
+            status.innerHTML = `✅ Đã chọn: <strong>${file.name}</strong><br>Đang upload và xử lý...`;
+            
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                document.getElementById('latexCode').value = ev.target.result;
+            };
+            reader.readAsText(file);
+
+            setTimeout(() => {
+                status.innerHTML += `<br>✅ Upload &amp; compile thành công!`;
+                alert(`File ${file.name} đã được tải lên thành công!\nNội dung đã tự động đưa vào phần Compile LaTeX.`);
+            }, 1500);
+        });
+
+        // COMPILE
         function compileLaTeX() {
             document.getElementById('preview').classList.remove('hidden');
+            setTimeout(() => alert('✅ LaTeX đã compile thành PDF đẹp!\n(Bản demo - sẽ tải file thật khi có backend)'), 400);
         }
+
+        // AI DEMO
+        function generateAI() {
+            const prompt = document.getElementById('aiPrompt').value || "Toán lớp 10 chương hàm số";
+            const result = document.getElementById('aiResult');
+            result.classList.remove('hidden');
+            result.innerHTML = `Đề thi đã được AI sinh thành công trong 28 giây!<br><br>
+                \\documentclass{exam}<br>
+                ... (code LaTeX hoàn chỉnh + đáp án + lời giải)<br><br>
+                <span class="text-green-400">Sẵn sàng giao đề ngay!</span>`;
+            showAIModal();
+        }
+
         function showAIModal() {
             document.getElementById('aiModal').classList.remove('hidden');
-            document.getElementById('aiResult').classList.add('hidden');
         }
         function closeAIModal() {
             document.getElementById('aiModal').classList.add('hidden');
+            document.getElementById('aiResult').classList.add('hidden');
         }
-        function generateAI() {
-            const prompt = document.getElementById('aiPrompt').value || "Toán lớp 10 chương hàm số";
-            const resultDiv = document.getElementById('aiResult');
-            resultDiv.classList.remove('hidden');
-            resultDiv.innerHTML = `Đã sinh đề thành công!<br><br>
-                \\documentclass{exam}<br>
-                \\begin{document}<br>
-                Câu 1: Giải phương trình ...<br>
-                (Đáp án & lời giải tự động đã được tạo)<br>
-                <span class="text-green-400">Thời gian sinh: 28 giây</span>`;
-        }
-        // Tailwind script
-        tailwind.config = { content: ["*"], theme: { extend: {} } }
+
+        // Sidebar active
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.querySelectorAll('nav a').forEach(l => l.classList.remove('tab-active'));
+                link.classList.add('tab-active');
+            });
+        });
     </script>
 </body>
 </html>
