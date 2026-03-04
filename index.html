@@ -11,8 +11,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
         body { font-family: 'Roboto', sans-serif; }
         .tab-active { border-left: 4px solid #22c55e; background-color: #1f2937; }
-        .loading { animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
 </head>
 <body class="bg-gray-950 text-white min-h-screen">
@@ -20,7 +18,7 @@
 <!-- HEADER -->
 <header class="bg-gray-900 border-b border-gray-800 p-4 flex items-center justify-between sticky top-0 z-50">
     <div class="flex items-center gap-3">
-        <div class="bg-green-500 text-white w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xl">L</div>
+        <div class="bg-green-500 text-white w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xl">L</div>
         <div>
             <h1 class="text-2xl font-bold">LEG Pro</h1>
             <p class="text-xs text-green-400">LaTeX Exam Genius</p>
@@ -84,7 +82,7 @@
             <h3 class="font-semibold mb-4 flex items-center gap-2">
                 <i class="fas fa-robot text-green-400"></i> Tạo đề bằng AI (Thật 100%)
             </h3>
-            <textarea id="aiPrompt" rows="4" class="w-full bg-gray-900 rounded-2xl p-5 text-sm resize-y border border-gray-700 focus:border-green-500 outline-none" placeholder="Ví dụ: Toán lớp 10, chương Lũy thừa, 10 câu trắc nghiệm, độ khó trung bình"></textarea>
+            <textarea id="aiPrompt" rows="4" class="w-full bg-gray-900 rounded-2xl p-5 text-sm resize-y border border-gray-700 focus:border-green-500 outline-none" placeholder="Ví dụ: Toán lớp 11, phương trình lượng giác, 10 câu trắc nghiệm"></textarea>
             <button onclick="generateRealAI()" id="aiButton" class="mt-4 w-full bg-green-500 hover:bg-green-600 py-3.5 rounded-2xl font-bold transition flex items-center justify-center gap-2">
                 <i class="fas fa-wand-magic-sparkles"></i> Sinh đề ngay (20-30 giây)
             </button>
@@ -130,13 +128,14 @@ const SUPABASE_URL = 'https://vrqfuhddhmuazuknlofz.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZycWZ1aGRkaG11YXp1a25sb2Z6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDE3ODYsImV4cCI6MjA4ODIxNzc4Nn0.DgzVEzTRa9dypVpq7_oXTK0GKCHHQwAN9tKNHIBafyA';
 const GEMINI_KEY = 'AIzaSyC1QL_gCFGziNR9Ftwt_oZwu4K8k-JXKeE';
 
-// Khởi tạo Supabase client NGAY LẬP TỨC
+// ==================== KHỞI TẠO SUPABASE NGAY LẬP TỨC ====================
 let supabaseClient;
 try {
     supabaseClient = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    console.log('✅ Supabase initialized');
+    console.log('✅ Supabase initialized successfully');
 } catch(e) {
     console.error('❌ Supabase init error:', e);
+    alert('Lỗi kết nối Supabase: ' + e.message);
 }
 
 // ==================== UPLOAD FILE ====================
@@ -145,6 +144,8 @@ function triggerFileSelect() {
     if (fileInput) {
         fileInput.click();
         console.log('📁 File dialog triggered');
+    } else {
+        alert('❌ Lỗi: Không tìm thấy input file');
     }
 }
 
@@ -159,9 +160,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!file) return;
             
             console.log('📤 Uploading:', file.name);
-            statusEl.innerHTML = '<span class="loading">⏳ Đang upload <strong>' + file.name + '</strong> lên cloud...</span>';
+            statusEl.innerHTML = '<span class="text-green-400">⏳ Đang upload <strong>' + file.name + '</strong> lên cloud...</span>';
             
             try {
+                // Kiểm tra supabaseClient đã sẵn sàng chưa
+                if (!supabaseClient || !supabaseClient.storage) {
+                    throw new Error('Supabase client chưa khởi tạo. Vui lòng refresh trang.');
+                }
+                
                 const fileName = Date.now() + '-' + file.name;
                 const { data, error } = await supabaseClient.storage
                     .from('exam-files')
@@ -184,9 +190,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('✅ Upload thành công!\nFile đã lưu trên cloud Supabase.');
                 
             } catch(err) {
+                console.error('Upload error:', err);
                 statusEl.innerHTML = '❌ <strong>Lỗi upload:</strong> ' + err.message + 
-                    '<br><small class="text-gray-500">(Kiểm tra Policy bucket đã tạo chưa?)</small>';
-                alert('❌ Lỗi upload: ' + err.message);
+                    '<br><small class="text-gray-500">(Kiểm tra: 1. Policy bucket đã tạo chưa? 2. Refresh trang và thử lại)</small>';
+                alert('❌ Lỗi upload: ' + err.message + '\n\n💡 Giải pháp:\n1. Vào Supabase → Storage → exam-files → Policies\n2. Tạo 2 policy với expression: true\n3. Refresh trang và thử lại');
             }
         });
     }
@@ -194,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ==================== AI GEMINI ====================
 async function generateRealAI() {
-    const prompt = document.getElementById('aiPrompt').value.trim() || 'Toán lớp 10, 5 câu trắc nghiệm đơn giản';
+    const prompt = document.getElementById('aiPrompt').value.trim() || 'Toán lớp 11, phương trình lượng giác, 5 câu trắc nghiệm';
     const btn = document.getElementById('aiButton');
     const latexArea = document.getElementById('latexCode');
     const preview = document.getElementById('preview');
@@ -265,8 +272,8 @@ async function generateRealAI() {
 \\begin{document}
 \\begin{center}
 \\textbf{\\Large ĐỀ KIỂM TRA 15 PHÚT}\\\\
-\\textbf{Môn: Toán - Lớp 10}\\\\
-\\textbf{Chương: Lũy thừa - Hàm số lũy thừa}
+\\textbf{Môn: Toán - Lớp 11}\\\\
+\\textbf{Chương: Phương trình lượng giác}
 \\end{center}
 \\vspace{0.5cm}
 
@@ -279,47 +286,42 @@ async function generateRealAI() {
 \\textbf{PHẦN I: TRẮC NGHIỆM (5 điểm)}
 
 \\begin{enumerate}
-\\item[\\textbf{Câu 1:}] Rút gọn biểu thức $\\\\frac{a^{\\\\frac{2}{3}} \\\\cdot a^{\\\\frac{1}{3}}}{a^{\\\\frac{1}{2}}}$ với $a > 0$.
+\\item[\\textbf{Câu 1:}] Nghiệm của phương trình $\\\\sin x = \\\\frac{1}{2}$ là:
 \\\\begin{enumerate}
-\\\\item[A.] $a^{\\\\frac{1}{2}}$ \\\\item[B.] $a^{\\\\frac{1}{3}}$
-\\\\item[C.] $a^{\\\\frac{5}{6}}$ \\\\item[D.] $a$
+\\\\item[A.] $x = \\\\frac{\\\\pi}{6} + k2\\\\pi$ \\\\item[B.] $x = \\\\frac{\\\\pi}{3} + k2\\\\pi$
+\\\\item[C.] $x = \\\\frac{\\\\pi}{4} + k2\\\\pi$ \\\\item[D.] $x = \\\\frac{\\\\pi}{2} + k2\\\\pi$
 \\end{enumerate}
 
-\\item[\\textbf{Câu 2:}] Tìm tập xác định của hàm số $y = (x-2)^{\\\\frac{1}{3}}$.
+\\item[\\textbf{Câu 2:}] Phương trình $\\\\cos x = 0$ có nghiệm là:
 \\\\begin{enumerate}
-\\\\item[A.] $\\\\mathbb{R}$ \\\\item[B.] $[2; +\\\\infty)$
-\\\\item[C.] $(2; +\\\\infty)$ \\\\item[D.] $\\\\mathbb{R} \\\\setminus \\\\{2\\\\}$
+\\\\item[A.] $x = \\\\frac{\\\\pi}{2} + k\\\\pi$ \\\\item[B.] $x = k\\\\pi$
+\\\\item[C.] $x = \\\\frac{\\\\pi}{4} + k\\\\pi$ \\\\item[D.] $x = \\\\frac{\\\\pi}{6} + k\\\\pi$
 \\end{enumerate}
 
-\\item[\\textbf{Câu 3:}] Đạo hàm của hàm số $y = x^{\\\\sqrt{2}}$ là:
+\\item[\\textbf{Câu 3:}] Tìm nghiệm của $\\\\tan x = 1$:
 \\\\begin{enumerate}
-\\\\item[A.] $\\\\sqrt{2}x^{\\\\sqrt{2}-1}$ \\\\item[B.] $x^{\\\\sqrt{2}-1}$
-\\\\item[C.] $\\\\frac{x^{\\\\sqrt{2}}}{\\\\sqrt{2}}$ \\\\item[D.] $\\\\sqrt{2}x^{\\\\sqrt{2}}$
+\\\\item[A.] $x = \\\\frac{\\\\pi}{4} + k\\\\pi$ \\\\item[B.] $x = \\\\frac{\\\\pi}{3} + k\\\\pi$
+\\\\item[C.] $x = \\\\frac{\\\\pi}{6} + k\\\\pi$ \\\\item[D.] $x = \\\\frac{\\\\pi}{2} + k\\\\pi$
 \\end{enumerate}
 
-\\item[\\textbf{Câu 4:}] Giá trị của $8^{\\\\frac{2}{3}}$ bằng:
+\\item[\\textbf{Câu 4:}] Phương trình $\\\\sin^2 x + \\\\cos^2 x = 1$ có nghiệm:
 \\\\begin{enumerate}
-\\\\item[A.] 2 \\\\item[B.] 4 \\\\item[C.] 6 \\\\item[D.] 8
+\\\\item[A.] Vô số nghiệm \\\\item[B.] Vô nghiệm
+\\\\item[C.] 1 nghiệm \\\\item[D.] 2 nghiệm
 \\end{enumerate}
 
-\\item[\\textbf{Câu 5:}] Hàm số $y = x^{-2}$ đồng biến trên khoảng nào?
+\\item[\\textbf{Câu 5:}] Giá trị lớn nhất của $y = 2\\\\sin x + 1$ là:
 \\\\begin{enumerate}
-\\\\item[A.] $(0; +\\\\infty)$ \\\\item[B.] $(-\\\\infty; 0)$
-\\\\item[C.] $\\\\mathbb{R}$ \\\\item[D.] $[0; +\\\\infty)$
+\\\\item[A.] 3 \\\\item[B.] 2 \\\\item[C.] 1 \\\\item[D.] 0
 \\end{enumerate}
 \\end{enumerate}
 
 \\vspace{0.5cm}
 \\textbf{PHẦN II: TỰ LUẬN (5 điểm)}
 
-\\textbf{Câu 6 (3 điểm):} Cho hàm số $y = x^{\\\\frac{3}{2}}$.
-\\\\begin{enumerate}
-\\\\item[a)] Tìm tập xác định.
-\\\\item[b)] Tính đạo hàm.
-\\\\item[c)] Tính giá trị của hàm số tại $x = 4$.
-\\end{enumerate}
+\\textbf{Câu 6 (3 điểm):} Giải phương trình: $\\\\sin 2x - \\\\cos x = 0$
 
-\\textbf{Câu 7 (2 điểm):} Giải phương trình: $x^{\\\\frac{2}{3}} - 4x^{\\\\frac{1}{3}} + 3 = 0$
+\\textbf{Câu 7 (2 điểm):} Tìm nghiệm của phương trình trong khoảng $(0; 2\\\\pi)$: $\\\\cos 2x + \\\\sin x = 0$
 
 \\vspace{1cm}
 \\begin{center}
@@ -360,7 +362,7 @@ function compileLaTeX() {
     alert('✅ Compile thành công!\nCopy code LaTeX để in đề hoặc chỉnh sửa trên Overleaf.');
 }
 
-// ==================== MODAL (giữ cho tương thích) ====================
+// ==================== MODAL ====================
 function showAIModal() {
     document.getElementById('aiPrompt').focus();
 }
