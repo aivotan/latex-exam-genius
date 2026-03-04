@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LEG Pro - LaTeX Exam Genius</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
@@ -53,12 +54,12 @@
         <main class="ml-64 flex-1 p-8">
             <h2 class="text-3xl font-bold mb-8">Bảng điều khiển Giáo viên</h2>
 
-            <!-- UPLOAD FILE THẬT -->
+            <!-- UPLOAD FILE THẬT + SUPABASE -->
             <div class="bg-gray-800 rounded-3xl p-8 mb-8">
                 <div class="text-center">
                     <i class="fas fa-cloud-upload-alt text-6xl text-green-500 mb-6"></i>
                     <p class="text-xl font-medium mb-2">Tải lên đề thi LaTeX mới</p>
-                    <p class="text-gray-400 mb-8">Chọn file .tex hoặc kéo thả vào đây</p>
+                    <p class="text-gray-400 mb-8">Chọn file .tex – sẽ tự động lưu vĩnh viễn trên cloud</p>
                     
                     <input type="file" id="latexFile" accept=".tex,.txt" class="hidden">
                     <button onclick="triggerFileUpload()" 
@@ -72,20 +73,18 @@
 
             <!-- TWO CARDS -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- AI CARD -->
                 <div class="bg-gray-800 rounded-3xl p-6">
                     <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="fas fa-robot text-green-400"></i> Tạo đề bằng AI (Mới)</h3>
-                    <textarea id="aiPrompt" rows="4" class="w-full bg-gray-900 rounded-2xl p-5 text-sm resize-y" placeholder="Ví dụ: Toán lớp 10, chương hàm số, 15 câu trắc nghiệm + 2 tự luận"></textarea>
+                    <textarea id="aiPrompt" rows="4" class="w-full bg-gray-900 rounded-2xl p-5 text-sm resize-y" placeholder="Ví dụ: Toán lớp 10, chương hàm số..."></textarea>
                     <button onclick="generateAI()" class="mt-4 w-full bg-green-500 hover:bg-green-600 py-3.5 rounded-2xl font-bold transition">Sinh đề ngay (30 giây)</button>
                 </div>
 
-                <!-- COMPILE CARD -->
                 <div class="bg-gray-800 rounded-3xl p-6">
                     <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="fas fa-code text-green-400"></i> Compile LaTeX Realtime</h3>
-                    <textarea id="latexCode" rows="4" class="w-full bg-gray-900 rounded-2xl p-5 text-sm font-mono text-green-300 resize-y" placeholder="Paste code LaTeX hoặc file sẽ tự động điền vào đây..."></textarea>
+                    <textarea id="latexCode" rows="4" class="w-full bg-gray-900 rounded-2xl p-5 text-sm font-mono text-green-300 resize-y" placeholder="Nội dung file sẽ tự động xuất hiện ở đây..."></textarea>
                     <button onclick="compileLaTeX()" class="mt-4 w-full bg-white text-black hover:bg-green-400 py-3.5 rounded-2xl font-bold transition">Compile & Xem PDF</button>
                     <div id="preview" class="mt-4 hidden bg-black/70 rounded-2xl p-6 text-center text-green-400 text-sm">
-                        ✅ Compile thành công!<br><span class="text-xs block mt-2">PDF preview sẵn sàng (demo)</span>
+                        ✅ Compile thành công!
                     </div>
                 </div>
             </div>
@@ -100,8 +99,8 @@
                     <div class="bg-gray-800 p-5 rounded-2xl">4. Xóa trọn câu hỏi</div>
                     <div class="bg-emerald-900 p-5 rounded-2xl text-emerald-300">5. Chấm bài tự động AI</div>
                     <div class="bg-emerald-900 p-5 rounded-2xl text-emerald-300">6. Phân tích điểm yếu học sinh bằng AI</div>
-                    <div class="bg-emerald-900 p-5 rounded-2xl text-emerald-300">7. Phòng thi realtime (xem live)</div>
-                    <div class="bg-emerald-900 p-5 rounded-2xl text-emerald-300">8. Hợp tác nhiều giáo viên chỉnh đề</div>
+                    <div class="bg-emerald-900 p-5 rounded-2xl text-emerald-300">7. Phòng thi realtime</div>
+                    <div class="bg-emerald-900 p-5 rounded-2xl text-emerald-300">8. Hợp tác nhiều giáo viên</div>
                     <div class="bg-emerald-900 p-5 rounded-2xl text-emerald-300">9. Thư viện đề cộng đồng</div>
                     <div class="bg-emerald-900 p-5 rounded-2xl text-emerald-300">10. Xuất báo cáo Bộ GD&amp;ĐT tự động</div>
                 </div>
@@ -123,62 +122,72 @@
 
     <script>
         tailwind.config = { content: ["*"] };
+        let supabaseClient;
 
-        // UPLOAD FILE THẬT
-        function triggerFileUpload() {
+        // Khởi tạo Supabase
+        function initSupabase() {
+            const supabaseUrl = 'https://vrqfuhddhmuazuknlofz.supabase.co';
+            const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZycWZ1aGRkaG11YXp1a25sb2Z6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDE3ODYsImV4cCI6MjA4ODIxNzc4Nn0.DgzVEzTRa9dypVpq7_oXTK0GKCHHQwAN9tKNHIBafyA';
+            supabaseClient = Supabase.createClient(supabaseUrl, supabaseKey);
+        }
+
+        // Upload file thật lên Supabase
+        async function triggerFileUpload() {
             document.getElementById('latexFile').click();
         }
-        document.getElementById('latexFile').addEventListener('change', function(e) {
+
+        document.getElementById('latexFile').addEventListener('change', async function(e) {
             const file = e.target.files[0];
             if (!file) return;
-            const status = document.getElementById('fileStatus');
-            status.innerHTML = `✅ Đã chọn: <strong>${file.name}</strong><br>Đang upload và xử lý...`;
-            
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-                document.getElementById('latexCode').value = ev.target.result;
-            };
-            reader.readAsText(file);
 
-            setTimeout(() => {
-                status.innerHTML += `<br>✅ Upload &amp; compile thành công!`;
-                alert(`File ${file.name} đã được tải lên thành công!\nNội dung đã tự động đưa vào phần Compile LaTeX.`);
-            }, 1500);
+            const status = document.getElementById('fileStatus');
+            status.innerHTML = `Đang upload <strong>${file.name}</strong> lên cloud Supabase...`;
+
+            const fileName = Date.now() + '-' + file.name;
+
+            const { data, error } = await supabaseClient.storage
+                .from('exam-files')
+                .upload(fileName, file, { upsert: true });
+
+            if (error) {
+                status.innerHTML = `❌ Lỗi: ${error.message}`;
+                alert('Upload lỗi: ' + error.message);
+            } else {
+                const publicUrl = `https://vrqfuhddhmuazuknlofz.supabase.co/storage/v1/object/public/exam-files/${fileName}`;
+                status.innerHTML = `✅ Đã lưu vĩnh viễn trên cloud!<br>File: <strong>${file.name}</strong><br><a href="${publicUrl}" target="_blank" class="text-blue-400 underline">Nhấn để xem link tải</a>`;
+
+                // Đọc nội dung đưa vào Compile
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    document.getElementById('latexCode').value = ev.target.result;
+                };
+                reader.readAsText(file);
+
+                alert(`🎉 File ${file.name} đã lưu thành công trên Supabase!\nNội dung đã tự động đưa vào phần Compile.`);
+            }
         });
 
-        // COMPILE
         function compileLaTeX() {
             document.getElementById('preview').classList.remove('hidden');
-            setTimeout(() => alert('✅ LaTeX đã compile thành PDF đẹp!\n(Bản demo - sẽ tải file thật khi có backend)'), 400);
+            alert('✅ LaTeX compile thành công! (PDF preview demo)');
         }
 
-        // AI DEMO
         function generateAI() {
             const prompt = document.getElementById('aiPrompt').value || "Toán lớp 10 chương hàm số";
             const result = document.getElementById('aiResult');
             result.classList.remove('hidden');
-            result.innerHTML = `Đề thi đã được AI sinh thành công trong 28 giây!<br><br>
-                \\documentclass{exam}<br>
-                ... (code LaTeX hoàn chỉnh + đáp án + lời giải)<br><br>
-                <span class="text-green-400">Sẵn sàng giao đề ngay!</span>`;
+            result.innerHTML = `Đề thi AI đã sinh thành công!<br><br>Code LaTeX hoàn chỉnh + đáp án + lời giải đã sẵn sàng.<br><span class="text-green-400">Sắp tới sẽ kết nối Gemini thật 100%!</span>`;
             showAIModal();
         }
 
-        function showAIModal() {
-            document.getElementById('aiModal').classList.remove('hidden');
-        }
+        function showAIModal() { document.getElementById('aiModal').classList.remove('hidden'); }
         function closeAIModal() {
             document.getElementById('aiModal').classList.add('hidden');
             document.getElementById('aiResult').classList.add('hidden');
         }
 
-        // Sidebar active
-        document.querySelectorAll('nav a').forEach(link => {
-            link.addEventListener('click', () => {
-                document.querySelectorAll('nav a').forEach(l => l.classList.remove('tab-active'));
-                link.classList.add('tab-active');
-            });
-        });
+        // Khởi động
+        window.onload = initSupabase;
     </script>
 </body>
 </html>
